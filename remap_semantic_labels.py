@@ -6,8 +6,44 @@ import os
 import yaml
 import numpy as np
 
+config_path = "utils/semantic_kitti_api/config/semantic-kitti.yaml"
+CFG = yaml.safe_load(open(config_path, "r"))
+
 # possible splits
 splits = ["train", "valid", "test"]
+
+def remap_labels(labels):
+    remapdict = CFG["learning_map"]
+    lignore = lambda el: CFG["learning_ignore"].get(el, True)
+
+    # make lookup table for mapping
+    maxkey = max(remapdict.keys())
+
+    # +100 hack making lut bigger just in case there are unknown labels
+    remap_lut = np.zeros((maxkey + 100), dtype=np.int32)
+    remap_lut[list(remapdict.keys())] = list(remapdict.values())
+
+    upper_half = labels >> 16      # get upper half for instances
+    lower_half = labels & 0xFFFF   # get lower half for semantics
+    lower_half = remap_lut[lower_half]  # do the remapping of semantics
+    mask = np.logical_not(list(map(lignore, lower_half)))
+    labels = (upper_half << 16) + lower_half   # reconstruct full label
+
+    return labels.astype(np.int32), mask
+
+def make_true_ground(labels):
+        ground_dict = {
+            40: "road",
+            44: "parking",
+            48: "sidewalk",
+            49: "other-ground",
+            72: "terrain",
+        }
+        lmap = lambda el: CFG["learning_map"][el]
+        keys = list(map(lmap, ground_dict.keys()))
+        return np.array(
+            list(map(lambda label: label in keys, labels))
+        ).astype(int)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser("./remap_semantic_labels.py")
