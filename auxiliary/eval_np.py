@@ -17,7 +17,7 @@ class PanopticEval:
         self, n_classes, device=None, ignore=None, offset=2 ** 32, min_points=30
     ):
         self.n_classes = n_classes
-        assert device == None
+        assert device is None
         self.ignore = np.array(ignore, dtype=np.int64)
         self.include = np.array(
             [n for n in range(self.n_classes) if n not in self.ignore], dtype=np.int64

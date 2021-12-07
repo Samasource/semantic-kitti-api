@@ -156,10 +156,7 @@ if __name__ == "__main__":
 
     missing_pred_files = False
 
-    if args.predictions is None:
-        prediction_dir = args.dataset
-    else:
-        prediction_dir = args.predictions
+    prediction_dir = args.dataset if args.predictions is None else args.predictions
 
     # check that all prediction files exist
     for pred_file in filenames_pred:
@@ -178,7 +175,7 @@ if __name__ == "__main__":
     for i, f in enumerate(evaluation_pairs):
         if 100.0 * i / len(evaluation_pairs) >= progress:
             print("{}% ".format(progress), end="", flush=True)
-            progress = progress + 10
+            progress += 10
 
         filename_gt = os.path.join(args.dataset, f[0])
         filename_pred = os.path.join(prediction_dir, f[1])
@@ -236,9 +233,7 @@ if __name__ == "__main__":
     )
 
     # write "scores.txt" with all information
-    results = {}
-    results["iou_completion"] = float(acc_cmpltn)
-    results["iou_mean"] = float(mIoU_ssc)
+    results = {'iou_completion': float(acc_cmpltn), 'iou_mean': float(mIoU_ssc)}
 
     for i, jacc in enumerate(class_jaccard):
         if i not in ignore:
