@@ -6,7 +6,7 @@ import os
 import yaml
 import numpy as np
 
-config_path = "utils/semantic_kitti_api/config/semantic-kitti.yaml"
+config_path = "./config/semantic-kitti.yaml"
 CFG = yaml.safe_load(open(config_path, "r"))
 
 # possible splits
