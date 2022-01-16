@@ -12,7 +12,7 @@ import struct
 import time
 
 
-def parse_calibration(filename):
+def parse_calibration(filename, read=True):
     """read calibration file with given filename
 
     Returns
@@ -22,7 +22,11 @@ def parse_calibration(filename):
     """
     calib = {}
 
-    calib_file = open(filename)
+    if read:
+        calib_file = open(filename)
+    else:
+        calib_file = filename
+
     for line in calib_file:
         key, content = line.strip().split(":")
         values = [float(v) for v in content.strip().split()]
@@ -35,12 +39,10 @@ def parse_calibration(filename):
 
         calib[key] = pose
 
-    calib_file.close()
-
     return calib
 
 
-def parse_poses(filename, calibration):
+def parse_poses(filename, calibration, read=True):
     """read poses file with per-scan poses from given filename
 
     Returns
@@ -48,7 +50,10 @@ def parse_poses(filename, calibration):
     list
         list of poses as 4x4 numpy arrays.
     """
-    file = open(filename)
+    if read:
+        file = open(filename)
+    else:
+        file = filename
 
     poses = []
 
